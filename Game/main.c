@@ -109,15 +109,14 @@ int main()
    
     //drawTriangle(VAO, VBO, EBO, myProgram);
    
-
-    unsigned int texture1 = initTexture();
+    unsigned int texture1 = initTexture(myProgram);
     //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
    
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
-    glUseProgram(myProgram); // don't forget to activate/use the shader before setting uniforms!
+   //glUseProgram(myProgram); // don't forget to activate/use the shader before setting uniforms!
     // either set it manually like so:
-    glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
+    //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
     // render loop
     // -----------
     vec3 newLoc = { 0.0f, 0.0f, -0.5f};
@@ -144,8 +143,7 @@ int main()
         //glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
         //glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-        drawTriangle(VAO, VBO, EBO, myProgram);
-        initMenu(myProgram);
+        
         glUseProgram(myProgram);
         // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
         //glDrawArrays(GL_TRIANGLES, 0, 6);
@@ -156,11 +154,20 @@ int main()
         //glm_rotate_y(projection, 1, projection);
         //mat4 newLoc = { -0.5f, 0.4f, 0.2f, 0.4f };
        // glm_translate(model, newLoc);
+        glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
+        //glBindTexture(GL_TEXTURE_2D, texture1);
         // render container
         //glBindVertexArray(VAO); 
         glBindVertexArray(*VAO); 
+        glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, texture1);
         
+        drawTriangle(VAO, VBO, EBO, myProgram);
+
+   
+        glBindVertexArray(*VAO);
+        initMenu(myProgram);
         //glUniformMatrix4fv(glGetUniformLocation(myProgram, "view"), 1, GL_FALSE, &lookAt[0][0]);
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         

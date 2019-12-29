@@ -13,10 +13,10 @@ void initMenu(int myProgram) {
 
     float vertices[] = {
         // positions          // colors           // texture coords
-         1.0f,  1.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         1.0f, -1.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -1.0f, -1.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -1.0f,  1.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+         2.0f,  -2.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
+         2.0f, 2.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
+        1.1f, 2.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
+        1.1f,  -2.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
@@ -48,6 +48,6 @@ void initMenu(int myProgram) {
     glEnableVertexAttribArray(5);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    vec3 newLoc = { -2.0f, -2.0f, 0.0f };
-    glm_translate(model, newLoc);
+    
+
 }

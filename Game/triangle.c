@@ -46,6 +46,7 @@ void drawTriangle(unsigned int *VAO, unsigned int *VBO, unsigned int *EBO, int m
     glEnableVertexAttribArray(2);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
 }
 
 void setModel(float valueX, float valueY) {
