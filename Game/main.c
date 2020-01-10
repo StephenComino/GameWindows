@@ -5,10 +5,14 @@
 #include <cglm.h>   /* for library call (this also includes cglm.h) */
 
 #include "triangle.h"
-#include "menu.h"
+#include "menu.h" // Menu to do user building
+#include "menu_box.h" // A box for the menu
 #include "texture.h"
 #include "initShaders.h"
+#include "initButtonTexture.h"
 
+double get_mouse_x_position(GLFWwindow* window);
+double get_mouse_y_position(GLFWwindow* window);
 /*
 //  TODO:
 //  1. Build Menu/ Decide top, bottom, left or right
@@ -17,7 +21,7 @@
 //
 //
 //
-                                    */
+        */
 const char* vertexShaderSource = "#version 330 core\n"
 "layout(location = 0) in vec3 aPos;\n"
 "layout(location = 1) in vec3 aColor;\n"
@@ -51,6 +55,20 @@ const char* fragmentShaderSource = "#version 330 core\n"
 "    FragColor = texture(ourTexture, TexCoord);\n"
 "}\n\0";
 
+
+static const char* fragmentMenuButton1 = "#version 330 core\n"
+//#version 330 core
+"out vec4 FragColor;\n"
+
+"in vec3 ourColor;\n"
+"in vec2 TexCoord;\n"
+
+"uniform sampler2D texture2;\n"
+
+"void main()\n"
+"{\n"
+"    FragColor = texture(texture2, TexCoord);\n"
+"}\n\0";
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 
@@ -58,9 +76,13 @@ void processInput(GLFWwindow* window);
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1000;
 mat4 projection = GLM_MAT4_IDENTITY_INIT;
-//mat4 model = GLM_MAT4_IDENTITY_INIT;
 mat4 lookAt = GLM_MAT4_IDENTITY_INIT;
-
+mat4 menuBox = GLM_MAT4_IDENTITY_INIT;
+mat4 model = GLM_MAT4_IDENTITY_INIT;
+// SHader programs
+static int myProgram; //= initShaders(vertexShaderSource, fragmentShaderSource);
+static int myShader;// = initShaders(vertexShaderSource, fragmentMenuButton1);
+int setSkeleton = 0;
 int main()
 {
     // glfw: initialize and configure
@@ -94,93 +116,98 @@ int main()
     }
 
     // Initialise and compile the Shaders
-    int myProgram = initShaders(vertexShaderSource, fragmentShaderSource);
+    myProgram = initShaders(vertexShaderSource, fragmentShaderSource);
+    myShader = initShaders(vertexShaderSource, fragmentMenuButton1);
    // unsigned int* VAO, * VBO, * EBO;
 
-    unsigned int * VAO = malloc(sizeof(unsigned int) * 1);
-    unsigned int * VBO = malloc(sizeof(unsigned int) * 1);
-    unsigned int * EBO = malloc(sizeof(unsigned int) * 1);
-    
     vec3 eye = { 0, 0, 1 };
     vec3 center = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
     glm_lookat(eye, center, up, lookAt);
     // Send the projection matrix to the shader
-   
-    //drawTriangle(VAO, VBO, EBO, myProgram);
-   
-    unsigned int texture1 = initTexture(myProgram);
-    //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
-   
-    // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
-    // -------------------------------------------------------------------------------------------
-   //glUseProgram(myProgram); // don't forget to activate/use the shader before setting uniforms!
-    // either set it manually like so:
-    //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
-    // render loop
-    // -----------
-    vec3 newLoc = { 0.0f, 0.0f, -0.5f};
-    //glm_rotate_z(model, 270.0f, model);
-    //glm_translate(model, newLoc);
+
+    unsigned int texture1 = initTexture(myProgram, myShader);
+    unsigned int texture2 = initButtonTexture(myShader);
+
+    vec3 newLoc = { 1.0f, 0.0f, -0.5f};
+
     glm_ortho(-(2.0f), 2.0f, 2.0f, -2.0f, -1.0f, 1.0f, projection);
+
+    // Triangle matrix;
+
+    // While the window is open render
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
-        // render
-        // ------
-         //initMenu();
-       
-        
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw our first triangle
-        // This is shader.use() in the tutorial
-        //glm_ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f, projection);
-
-        // Send the projection matrix to the shader
-        //glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-        //glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
         glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
         
         glUseProgram(myProgram);
-        // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-       
-        //glm_rotate_z(model, 0.01f, model);
-        //glm_rotate_y(model, 0.01f, model);
-        //glm_rotate_y(projection, 1, projection);
-        //mat4 newLoc = { -0.5f, 0.4f, 0.2f, 0.4f };
+        glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
        // glm_translate(model, newLoc);
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture1);
         //glBindTexture(GL_TEXTURE_2D, texture1);
         // render container
         //glBindVertexArray(VAO); 
-        glBindVertexArray(*VAO); 
-        glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, texture1);
+        //glBindVertexArray(VAO); 
         
-        drawTriangle(VAO, VBO, EBO, myProgram);
+        drawTriangle(myProgram, model);
+        glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
 
-   
-        glBindVertexArray(*VAO);
+
+        //glBindVertexArray(VAO);
         initMenu(myProgram);
-        //glUniformMatrix4fv(glGetUniformLocation(myProgram, "view"), 1, GL_FALSE, &lookAt[0][0]);
-        //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+
+        glUseProgram(myShader);
+
+        glUniform1i(glGetUniformLocation(myShader, "texture2"), 0);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, texture2);
+        
+        initMenuBox(menuBox, myShader);
+
+        if (setSkeleton == 1) {
+            mat4 model = GLM_MAT4_IDENTITY_INIT;
+
+            // Get mouse position
+            // get x;
+            //vec3 newPosition = GLM_VEC3_ONE_INIT;
+            double x = get_mouse_x_position(window);
+            double y = get_mouse_y_position(window);
+            vec3 newPosition = { x, y, 0.5f };
+            // get y;
+            glm_translate(model, newLoc);
+           // int myS = initShaders(vertexShaderSource, fragmentShaderSource);
+            drawTriangle(myProgram, model);
+            // ****************************************
+            // TODO:
+            // 1. Add a linked list
+            //     a. Each entry will have an id, and the model
+            //     b. This means each entry can be manipulated separetly
+            // 2. Add each model made to the list
+            // 3. Use this list to maniuplate each shape
+
+        }
+        else {
+            glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+        }
+        
+       
         
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
+        //deleteTriangleBuffers();
+        //deleteMenuBuffers();
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
     // optional: de-allocate all resources once they've outlived their purpose:
     // ------------------------------------------------------------------------
-    glDeleteVertexArrays(1, VAO);
-    glDeleteBuffers(1, VBO);
-    glDeleteBuffers(1, EBO);
+    //deleteTriangleBuffers();
+    deleteMenuBuffers();
     // glfw: terminate, clearing all previously allocated GLFW resources.
     // ------------------------------------------------------------------
     glfwTerminate();
@@ -191,59 +218,134 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
+    int newState;
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
    // else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
    //     glm_translate_x(model, -0.001f);
    // }
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
-        double x;
-        double y;
+    
+    else if ((newState = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT)) == GLFW_PRESS) {
+        double x = get_mouse_x_position(window);
+        double y = get_mouse_y_position(window);
         double modelX = getModelX();
         double modelY = getModelY();
-        glfwGetCursorPos(window, &x, &y);
-       // printf("\n x: %lf, y: %lf\n", x, y);
-        if (x == 0.000000f) {
-            x = (double)0.000001f;
-        }
-        else if (y == 0.000000f) {
-            y = (double)0.000001f;
-        }
+        
 
-        else if (modelX == 0.000000f) {
-            modelX = 0.000001f;
+        // Check if the click coordinates were within the centre box;
+        // If the menuButton was clicked then flag building
+        // if X > x between 1.2 -> 1.35
+        /* int oldState = GL_RELEASE;
+        int newState = glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT);
+        if (newState == GL_RELEASE && oldState == GL_PRESS) {
+            // whatever
         }
-        else if (modelY == 0.000000f) {
-            modelY = 0.000001f;
-        }
-        // upto 800. so range [1600, 800] / 1600 * -2 = [-1, -1]
-        // No values between [0, -1]
-        if (x <= 800) {
-            //printf("\nmodel: %lf, position: %lf\n ", model[3][0], (((800 - x) / 1600)) * -2);
-            x = (double)(((800 - x) / 800)) * -2;
+        oldState = newState; */ 
+        if ( newState == GLFW_PRESS && (x >= 1.20f && x <= 1.35) && (y <= -1.15f && y >= -1.40f)) {
+            printf("Here %lf", x);
+            if (setSkeleton == 0) {
+                setSkeleton = 1;
+                newState = GLFW_RELEASE;
+                return;
+            }
+            else {
+                setSkeleton = 0;
+                newState = GLFW_RELEASE;
+                return;
+            }
+            newState = GLFW_RELEASE;
+            // This should make the pointer into an object which than can be placed onto the map.
+            // I.E a Building which can be placed on the the stage
+
         }
         else {
-            // > 800
-            x = (double)((x - 800) / 800) * 2;
-           // printf("\nx: %lf\n ", x);
+
+            setModel((float)x, (float)y);
         }
-        if (y <= 500) {
-            y = (double)(((500 - y) / 500)) * -2;
-           // printf("\ny: %lf\n ", y);
-        }
-        else {
-            y = (double)((y - 500) / 500) * 2;
-           // printf("\ny: %lf\n ", y);
-        }
-        setModel((float)x, (float)y);
         //model[3][0] = (float)x;
         //model[3][1] = (float)y;
+ 
         return;
     }
 
 }
 
+double get_mouse_x_position(GLFWwindow* window) {
+
+    double x;
+    double y;
+    glfwGetCursorPos(window, &x, &y);
+    // printf("\n x: %lf, y: %lf\n", x, y);
+    if (x == 0.000000f) {
+        x = (double)0.000001f;
+    }
+    else if (y == 0.000000f) {
+        y = (double)0.000001f;
+    }
+
+    // upto 800. so range [1600, 800] / 1600 * -2 = [-1, -1]
+    // No values between [0, -1]
+    if (x <= 800) {
+        //printf("\nmodel: %lf, position: %lf\n ", model[3][0], (((800 - x) / 1600)) * -2);
+        x = (double)(((800 - x) / 800)) * -2;
+    }
+    else {
+        // > 800
+        x = (double)((x - 800) / 800) * 2;
+        // printf("\nx: %lf\n ", x);
+    }
+    if (y <= 500) {
+        y = (double)(((500 - y) / 500)) * -2;
+        // printf("\ny: %lf\n ", y);
+    }
+    else {
+        y = (double)((y - 500) / 500) * 2;
+        // printf("\ny: %lf\n ", y);
+    }
+
+    //vec3 positionVec = malloc(sizeof(vec3) * 1);
+    
+    return x;
+}
+
+double get_mouse_y_position(GLFWwindow* window) {
+
+    double x;
+    double y;
+    glfwGetCursorPos(window, &x, &y);
+    // printf("\n x: %lf, y: %lf\n", x, y);
+    if (x == 0.000000f) {
+        x = (double)0.000001f;
+    }
+    else if (y == 0.000000f) {
+        y = (double)0.000001f;
+    }
+
+    // upto 800. so range [1600, 800] / 1600 * -2 = [-1, -1]
+    // No values between [0, -1]
+    if (x <= 800) {
+        //printf("\nmodel: %lf, position: %lf\n ", model[3][0], (((800 - x) / 1600)) * -2);
+        x = (double)(((800 - x) / 800)) * -2;
+    }
+    else {
+        // > 800
+        x = (double)((x - 800) / 800) * 2;
+        // printf("\nx: %lf\n ", x);
+    }
+    if (y <= 500) {
+        y = (double)(((500 - y) / 500)) * -2;
+        // printf("\ny: %lf\n ", y);
+    }
+    else {
+        y = (double)((y - 500) / 500) * 2;
+        // printf("\ny: %lf\n ", y);
+    }
+
+    //vec3 positionVec = malloc(sizeof(vec3) * 1);
+
+    return y;
+}
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes
 // ---------------------------------------------------------------------------------------------
 void framebuffer_size_callback(GLFWwindow* window, int width, int height)

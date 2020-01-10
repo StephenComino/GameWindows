@@ -4,12 +4,14 @@
 #include <cglm.h>   /* for library call (this also includes cglm.h) */
 
 #include "menu.h"
+#include "initShaders.h"
+
+static unsigned int VAO = 0;
+static unsigned int VBO = 0;
+static unsigned int EBO = 0;
+
 
 void initMenu(int myProgram) {
-
-    unsigned int* VAO = malloc(sizeof(unsigned int) * 1);
-    unsigned int* VBO = malloc(sizeof(unsigned int) * 1);
-    unsigned int* EBO = malloc(sizeof(unsigned int) * 1);
 
     float vertices[] = {
         // positions          // colors           // texture coords
@@ -25,9 +27,9 @@ void initMenu(int myProgram) {
     mat4 model = GLM_MAT4_IDENTITY_INIT;
     glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
 
-    glGenVertexArrays(1, VAO);
-    glGenBuffers(1, VBO);
-    glGenBuffers(1, EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
+    glGenBuffers(1, &EBO);
 
     glBindVertexArray (VAO);
 
@@ -39,15 +41,19 @@ void initMenu(int myProgram) {
 
     // position attribute
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
-    glEnableVertexAttribArray(3);
+    glEnableVertexAttribArray(0);
     // color attribute
     glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(4);
+    glEnableVertexAttribArray(1);
     // texture coord attribute
     glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(5);
+    glEnableVertexAttribArray(2);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-    
+}
 
+void deleteMenuBuffers() {
+    glDeleteVertexArrays(1, VAO);
+    glDeleteBuffers(1, VBO);
+    glDeleteBuffers(1, EBO);
 }

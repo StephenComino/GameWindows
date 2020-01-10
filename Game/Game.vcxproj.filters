@@ -33,6 +33,12 @@
     <ClCompile Include="menu.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="menu_box.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="initButtonTexture.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="triangle.h">
@@ -48,6 +54,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="menu.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="menu_box.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="initButtonTexture.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

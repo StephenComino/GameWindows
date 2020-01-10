@@ -91,7 +91,12 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>C:\Users\scomi\OneDrive\Desktop\Opengl\cglm-master\include\cglm;C:\Users\scomi\OneDrive\Desktop\Opengl\include;C:\Users\scomi\OneDrive\Desktop\Opengl\glfw-3.3.bin.WIN64\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
+    <Link>
+      <AdditionalLibraryDirectories>C:\Users\scomi\OneDrive\Desktop\Opengl\glfw-3.3.bin.WIN64\lib-vc2019;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>glfw3.lib;glfw3dll.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
@@ -123,15 +128,19 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="glad.c" />
+    <ClCompile Include="initButtonTexture.c" />
     <ClCompile Include="initShaders.c" />
     <ClCompile Include="main.c" />
     <ClCompile Include="menu.c" />
+    <ClCompile Include="menu_box.c" />
     <ClCompile Include="textures.c" />
     <ClCompile Include="triangle.c" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="initButtonTexture.h" />
     <ClInclude Include="initShaders.h" />
     <ClInclude Include="menu.h" />
+    <ClInclude Include="menu_box.h" />
     <ClInclude Include="stb_image.h" />
     <ClInclude Include="texture.h" />
     <ClInclude Include="triangle.h" />
