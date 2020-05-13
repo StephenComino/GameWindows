@@ -4,48 +4,36 @@
 #include <cglm.h>   /* for library call (this also includes cglm.h) */
 
 #include "triangle.h"
+#include "vertexCoords.h"
 
 mat4 model = GLM_MAT4_IDENTITY_INIT;
 
-void drawTriangle(unsigned int *VAO, unsigned int *VBO, unsigned int *EBO, int myProgram) {
+void drawTriangle(triangle tri, int myProgram) {
     
+    unsigned int VAO, VBO;
+
     float vertices[] = {
-        // positions          // colors           // texture coords
-         0.5f,  0.5f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         0.5f, -0.5f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        -0.5f, -0.5f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        -0.5f,  0.5f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
-    };
-    unsigned int indices[] = {
-        0, 1, 3, // first triangle
-        1, 2, 3  // second triangle
+        tri.one.x, tri.one.y, tri.one.z, // left  
+         tri.two.x, tri.two.y, tri.two.z, // right 
+         tri.three.x,  tri.three.y, tri.three.z  // top   
     };
     
+    glUseProgram(myProgram);
 
     glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
-    glGenVertexArrays(1, VAO);
-    glGenBuffers(1, VBO);
-    glGenBuffers(1, EBO);
+    glGenVertexArrays(1, &VAO);
+    glGenBuffers(1, &VBO);
 
-    glBindVertexArray(*VAO);
+    glBindVertexArray(VAO);
 
-    glBindBuffer(GL_ARRAY_BUFFER, *VBO);
+    glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER,* EBO);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
     // position attribute
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)0);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
     glEnableVertexAttribArray(0);
-    // color attribute
-    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(3 * sizeof(float)));
-    glEnableVertexAttribArray(1);
-    // texture coord attribute
-    glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, 8 * sizeof(float), (void*)(6 * sizeof(float)));
-    glEnableVertexAttribArray(2);
 
-    glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+    glDrawArrays(GL_TRIANGLES, 0,3);
 
 }
 

@@ -8,6 +8,7 @@
 #include "menu.h"
 #include "texture.h"
 #include "initShaders.h"
+#include "vertexCoords.h"
 
 /*
 //  TODO:
@@ -19,41 +20,22 @@
 //
                                     */
 const char* vertexShaderSource = "#version 330 core\n"
-"layout(location = 0) in vec3 aPos;\n"
-"layout(location = 1) in vec3 aColor;\n"
-"layout(location = 2) in vec2 aTexCoord;\n"
-
-"uniform mat4 projection;\n"
+"layout (location = 0) in vec3 aPos;\n"
 "uniform mat4 model;\n"
-//"uniform mat4 view;\n"
-
-"out vec3 ourColor;\n"
-"out vec2 TexCoord;\n"
-
 "void main()\n"
 "{\n"
-"    gl_Position = projection * model * vec4(aPos, 1.0);\n"
-"    ourColor = aColor;\n"
-"    TexCoord = aTexCoord;\n"
-"}\n\0";
-
+"   gl_Position = model * vec4(aPos,1);\n"
+"}\0";
 const char* fragmentShaderSource = "#version 330 core\n"
-//#version 330 core
 "out vec4 FragColor;\n"
-
-"in vec3 ourColor;\n"
-"in vec2 TexCoord;\n"
-
-"uniform sampler2D ourTexture;\n"
-
 "void main()\n"
 "{\n"
-"    FragColor = texture(ourTexture, TexCoord);\n"
+"   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
 "}\n\0";
 
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
-
+triangle tri;
 // settings
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1000;
@@ -98,6 +80,7 @@ int main()
    // unsigned int* VAO, * VBO, * EBO;
 
     unsigned int * VAO = malloc(sizeof(unsigned int) * 1);
+    unsigned int* VAO2 = malloc(sizeof(unsigned int) * 1);
     unsigned int * VBO = malloc(sizeof(unsigned int) * 1);
     unsigned int * EBO = malloc(sizeof(unsigned int) * 1);
     
@@ -105,16 +88,29 @@ int main()
     vec3 center = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
     glm_lookat(eye, center, up, lookAt);
+
+    tri.one.x = 0.5f;
+    tri.one.y = 0.5f;
+    tri.one.z = 0.0f;
+    tri.two.x = 0.5f;
+    tri.two.y = -0.5f;
+    tri.two.z = 0.0f;
+    tri.three.x = 0.0f;
+    tri.three.y = 0.5f;
+    tri.three.z = 0.0f;
     // Send the projection matrix to the shader
    
     //drawTriangle(VAO, VBO, EBO, myProgram);
-   
-    unsigned int texture1 = initTexture(myProgram);
+
+    //unsigned int texture1 = initTexture(myProgram, "C:\\Users\\scomi\\Desktop\\tex3.jpg");
+    //unsigned int texture0 = initTexture(myProgram, "C:\\Users\\scomi\\Desktop\\tex.jpg");
+    
+    
     //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
    
     // tell opengl for each sampler to which texture unit it belongs to (only has to be done once)
     // -------------------------------------------------------------------------------------------
-   //glUseProgram(myProgram); // don't forget to activate/use the shader before setting uniforms!
+    //glUseProgram(myProgram); // don't forget to activate/use the shader before setting uniforms!
     // either set it manually like so:
     //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
     // render loop
@@ -122,52 +118,36 @@ int main()
     vec3 newLoc = { 0.0f, 0.0f, -0.5f};
     //glm_rotate_z(model, 270.0f, model);
     //glm_translate(model, newLoc);
-    glm_ortho(-(2.0f), 2.0f, 2.0f, -2.0f, -1.0f, 1.0f, projection);
+   //glm_ortho(-(2.0f), 2.0f, 2.0f, -2.0f, -1.0f, 1.0f, projection);
+ 
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
-
-        // render
-        // ------
-         //initMenu();
-       
         
         glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        // draw our first triangle
-        // This is shader.use() in the tutorial
-        //glm_ortho(0.0f, 800.0f, 600.0f, 0.0f, -1.0f, 1.0f, projection);
-
-        // Send the projection matrix to the shader
-        //glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-        //glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
-        glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
         
-        glUseProgram(myProgram);
-        // seeing as we only have a single VAO there's no need to bind it every time, but we'll do so to keep things a bit more organized
-        //glDrawArrays(GL_TRIANGLES, 0, 6);
-        //glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+       // glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
+        
+
        
-        //glm_rotate_z(model, 0.01f, model);
-        //glm_rotate_y(model, 0.01f, model);
-        //glm_rotate_y(projection, 1, projection);
-        //mat4 newLoc = { -0.5f, 0.4f, 0.2f, 0.4f };
-       // glm_translate(model, newLoc);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, texture1);
+       // glActiveTexture(GL_TEXTURE0);
+        //glBindTexture(GL_TEXTURE_2D, texture1);
         //glBindTexture(GL_TEXTURE_2D, texture1);
         // render container
         //glBindVertexArray(VAO); 
-        glBindVertexArray(*VAO); 
-        glActiveTexture(GL_TEXTURE1);
-        //glBindTexture(GL_TEXTURE_2D, texture1);
+        //glBindVertexArray(VAO); 
+        //glActiveTexture(GL_TEXTURE1);
+        //glBindTexture(GL_TEXTURE_2D, texture0);
         
-        drawTriangle(VAO, VBO, EBO, myProgram);
+       // triangle tri;
+       
+        
+        drawTriangle(tri, myProgram);
 
    
-        glBindVertexArray(*VAO);
-        initMenu(myProgram);
+       // initMenu(myProgram);
         //glUniformMatrix4fv(glGetUniformLocation(myProgram, "view"), 1, GL_FALSE, &lookAt[0][0]);
         //glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         
@@ -194,14 +174,22 @@ void processInput(GLFWwindow* window)
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-   // else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-   //     glm_translate_x(model, -0.001f);
-   // }
+    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+        tri.one.x += -0.1f;
+        tri.one.y += -0.1f;
+    }
+    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+        tri.one.x += 0.1f;
+        tri.one.y += 0.1f;
+    }
     else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         double x;
         double y;
         double modelX = getModelX();
         double modelY = getModelY();
+
+        // Get current Object in use Somehow
+
         glfwGetCursorPos(window, &x, &y);
        // printf("\n x: %lf, y: %lf\n", x, y);
         if (x == 0.000000f) {
@@ -221,19 +209,19 @@ void processInput(GLFWwindow* window)
         // No values between [0, -1]
         if (x <= 800) {
             //printf("\nmodel: %lf, position: %lf\n ", model[3][0], (((800 - x) / 1600)) * -2);
-            x = (double)(((800 - x) / 800)) * -2;
+            x = (double)(((800 - x) / 800)) * -1;
         }
         else {
             // > 800
-            x = (double)((x - 800) / 800) * 2;
+            x = (double)((x - 800) / 800) * 1;
            // printf("\nx: %lf\n ", x);
         }
         if (y <= 500) {
-            y = (double)(((500 - y) / 500)) * -2;
+            y = (double)(((500 - y) / 500)) * 1;
            // printf("\ny: %lf\n ", y);
         }
         else {
-            y = (double)((y - 500) / 500) * 2;
+            y = (double)((y - 500) / 500) * -1;
            // printf("\ny: %lf\n ", y);
         }
         setModel((float)x, (float)y);
