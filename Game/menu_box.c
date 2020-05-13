@@ -3,35 +3,33 @@
 #include <GLFW/glfw3.h>
 #include <cglm.h>   /* for library call (this also includes cglm.h) */
 
-#include "menu.h"
-#include "initShaders.h"
+#include "menu_box.h"
 
-static unsigned int VAO = 0;
-static unsigned int VBO = 0;
-static unsigned int EBO = 0;
+void initMenuBox(mat4 menuBox, int myProgram) {
 
-
-void initMenu(int myProgram) {
+    unsigned int VAO = 0;
+    unsigned int VBO = 0;
+    unsigned int EBO = 0;
 
     float vertices[] = {
         // positions          // colors           // texture coords
-         2.0f,  -2.0f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 1.0f, // top right
-         2.0f, 2.0f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 0.0f, // bottom right
-        1.1f, 2.0f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 0.0f, // bottom left
-        1.1f,  -2.0f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 1.0f  // top left 
+         1.35f,  -1.40f, 0.0f,   1.0f, 0.0f, 0.0f,   1.0f, 0.0f, // top right
+         1.35f, -1.15f, 0.0f,   0.0f, 1.0f, 0.0f,   1.0f, 1.0f, // bottom right
+         1.20f, -1.15f, 0.0f,   0.0f, 0.0f, 1.0f,   0.0f, 1.0f, // bottom left
+         1.20f,  -1.40f, 0.0f,   1.0f, 1.0f, 0.0f,   0.0f, 0.0f  // top left 
     };
     unsigned int indices[] = {
         0, 1, 3, // first triangle
         1, 2, 3  // second triangle
     };
-    mat4 model = GLM_MAT4_IDENTITY_INIT;
-    glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
-
+    
+    glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &menuBox[0][0]);
+    
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
     glGenBuffers(1, &EBO);
 
-    glBindVertexArray (VAO);
+    glBindVertexArray(VAO);
 
     glBindBuffer(GL_ARRAY_BUFFER, VBO);
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
@@ -50,10 +48,5 @@ void initMenu(int myProgram) {
     glEnableVertexAttribArray(2);
 
     glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-}
 
-void deleteMenuBuffers() {
-    glDeleteVertexArrays(1, VAO);
-    glDeleteBuffers(1, VBO);
-    glDeleteBuffers(1, EBO);
 }
