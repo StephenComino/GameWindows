@@ -9,6 +9,7 @@
 #include "texture.h"
 #include "initShaders.h"
 #include "vertexCoords.h"
+#include "camera.h"
 
 /*
 //  TODO:
@@ -22,10 +23,14 @@
 const char* vertexShaderSource = "#version 330 core\n"
 "layout (location = 0) in vec3 aPos;\n"
 "uniform mat4 model;\n"
+"uniform mat4 view;\n"
+"uniform mat4 projection;\n"
+    
 "void main()\n"
 "{\n"
-"   gl_Position = model * vec4(aPos,1);\n"
+"   gl_Position = projection * view * model * vec4(aPos, 1.0f);\n"
 "}\0";
+
 const char* fragmentShaderSource = "#version 330 core\n"
 "out vec4 FragColor;\n"
 "void main()\n"
@@ -36,12 +41,14 @@ const char* fragmentShaderSource = "#version 330 core\n"
 void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 triangle tri;
+
+vec3 cameraPos = { 0.0f, 0.0f, 3.0f };
+vec3 cameraFront = { 0.0f, 0.0f, -1.0f };
+vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
+
 // settings
 const unsigned int SCR_WIDTH = 1600;
 const unsigned int SCR_HEIGHT = 1000;
-mat4 projection = GLM_MAT4_IDENTITY_INIT;
-//mat4 model = GLM_MAT4_IDENTITY_INIT;
-mat4 lookAt = GLM_MAT4_IDENTITY_INIT;
 
 int main()
 {
@@ -87,7 +94,6 @@ int main()
     vec3 eye = { 0, 0, 1 };
     vec3 center = { 0, 0, 0 };
     vec3 up = { 0, 1, 0 };
-    glm_lookat(eye, center, up, lookAt);
 
     tri.one.x = 0.5f;
     tri.one.y = 0.5f;
@@ -115,11 +121,22 @@ int main()
     //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
     // render loop
     // -----------
+    
     vec3 newLoc = { 0.0f, 0.0f, -0.5f};
     //glm_rotate_z(model, 270.0f, model);
     //glm_translate(model, newLoc);
    //glm_ortho(-(2.0f), 2.0f, 2.0f, -2.0f, -1.0f, 1.0f, projection);
- 
+    mat4 curModel = GLM_MAT4_IDENTITY_INIT;
+    triangle tri2;
+    tri2.one.x = 1.0f;
+            tri2.one.y = 1.0f;
+            tri2.one.z = 0.0f;
+            tri2.two.x = -1.0f;
+            tri2.two.y = 1.0f;
+            tri2.two.z = 0.0f;
+            tri2.three.x = -1.5f;
+            tri2.three.y = -1.5f;
+            tri2.three.z = 0.0f;
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
@@ -129,7 +146,7 @@ int main()
 
         
        // glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-        
+        initCamera(myProgram, SCR_WIDTH, SCR_HEIGHT, 45.0f, 0.01f, 100.0f, cameraPos, cameraFront, cameraUp);
 
        
        // glActiveTexture(GL_TEXTURE0);
@@ -142,9 +159,29 @@ int main()
         //glBindTexture(GL_TEXTURE_2D, texture0);
         
        // triangle tri;
+            
        
-        
-        drawTriangle(tri, myProgram);
+        for (int i = 0; i < 10; i++) {
+            
+           
+
+            triangle tri3;
+            tri3.one.x = -0.5f;
+            tri3.one.y = -0.5f;
+            tri3.one.z = 0.0f;
+            tri3.two.x = 0.2f;
+            tri3.two.y = 0.2f;
+            tri3.two.z = 0.0f;
+            tri3.three.x = -0.3f;
+            tri3.three.y = -0.5f;
+            tri3.three.z = 0.0f;
+            vec3 loc = { 0.00001f * i,0.00001f * i, 0.00001f * i };
+            glm_translate_to(curModel, loc, curModel);
+            drawTriangle(tri2, myProgram, curModel);
+            
+            
+            drawTriangle(tri3, myProgram, NULL);
+        }
 
    
        // initMenu(myProgram);
@@ -171,18 +208,33 @@ int main()
 // ---------------------------------------------------------------------------------------------------------
 void processInput(GLFWwindow* window)
 {
+    const float cameraSpeed = 0.05f; // adjust accordingly
     if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS) {
         glfwSetWindowShouldClose(window, GLFW_TRUE);
     }
-    else if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
-        tri.one.x += -0.1f;
-        tri.one.y += -0.1f;
-    }
-    else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
-        tri.one.x += 0.1f;
-        tri.one.y += 0.1f;
-    }
-    else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
+    else
+
+        if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) {
+            glm_vec3_muladds(cameraFront, cameraSpeed, cameraPos);
+        }
+        else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
+            vec3 neg;
+            glm_vec3_negate_to(cameraFront, neg);
+            glm_vec3_muladds(neg, cameraSpeed, cameraPos);
+        }
+        else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
+            vec3 crossNorm;
+            glm_vec3_crossn(cameraFront, cameraUp, crossNorm);
+            vec3 result;
+            glm_vec3_mul(crossNorm, &cameraSpeed, result);
+            glm_vec3_sub(cameraPos, result, cameraPos);
+        }
+        else if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) {
+            vec3 crossNorm;
+            glm_vec3_crossn(cameraFront, cameraUp, crossNorm);
+            glm_vec3_muladds(crossNorm, cameraSpeed, cameraPos);
+        } 
+        else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         double x;
         double y;
         double modelX = getModelX();
@@ -209,19 +261,19 @@ void processInput(GLFWwindow* window)
         // No values between [0, -1]
         if (x <= 800) {
             //printf("\nmodel: %lf, position: %lf\n ", model[3][0], (((800 - x) / 1600)) * -2);
-            x = (double)(((800 - x) / 800)) * -1;
+            x = (double)(((800 - x) / 800)) * -2;
         }
         else {
             // > 800
-            x = (double)((x - 800) / 800) * 1;
+            x = (double)((x - 800) / 800) * 2;
            // printf("\nx: %lf\n ", x);
         }
         if (y <= 500) {
-            y = (double)(((500 - y) / 500)) * 1;
+            y = (double)(((500 - y) / 500)) * 2;
            // printf("\ny: %lf\n ", y);
         }
         else {
-            y = (double)((y - 500) / 500) * -1;
+            y = (double)((y - 500) / 500) * -2;
            // printf("\ny: %lf\n ", y);
         }
         setModel((float)x, (float)y);

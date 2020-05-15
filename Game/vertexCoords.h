@@ -11,6 +11,7 @@ typedef struct triangle {
 	vertex one;
 	vertex two;
 	vertex three;
+	mat4 model;
 
 } triangle;
 

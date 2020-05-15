@@ -36,6 +36,9 @@
     <ClCompile Include="vertexCoords.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="camera.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="triangle.h">
@@ -54,6 +57,9 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="vertexCoords.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="camera.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

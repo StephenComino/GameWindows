@@ -8,19 +8,26 @@
 
 mat4 model = GLM_MAT4_IDENTITY_INIT;
 
-void drawTriangle(triangle tri, int myProgram) {
-    
-    unsigned int VAO, VBO;
+void drawTriangle(triangle tri, int myProgram, mat4 currentModel) {
 
+    unsigned int VAO, VBO;
+    mat4 thisModel = GLM_MAT4_IDENTITY_INIT;
     float vertices[] = {
         tri.one.x, tri.one.y, tri.one.z, // left  
          tri.two.x, tri.two.y, tri.two.z, // right 
          tri.three.x,  tri.three.y, tri.three.z  // top   
     };
+    if (currentModel == NULL) {
+        glm_mat4_copy(thisModel, tri.model);
+    }
+    else {
+        glm_mat4_copy(currentModel, tri.model);
+        printf("currentModel: %lf", currentModel[3][0]);
+    }
     
     glUseProgram(myProgram);
 
-    glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &model[0][0]);
+    glUniformMatrix4fv(glGetUniformLocation(myProgram, "model"), 1, GL_FALSE, &tri.model[0][0]);
     glGenVertexArrays(1, &VAO);
     glGenBuffers(1, &VBO);
 
