@@ -22,7 +22,6 @@ void drawTriangle(triangle tri, int myProgram, mat4 currentModel) {
     }
     else {
         glm_mat4_copy(currentModel, tri.model);
-        printf("currentModel: %lf", currentModel[3][0]);
     }
     
     glUseProgram(myProgram);

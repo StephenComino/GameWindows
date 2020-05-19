@@ -10,6 +10,7 @@
 #include "initShaders.h"
 #include "vertexCoords.h"
 #include "camera.h"
+#include "modelLoader.h"
 
 /*
 //  TODO:
@@ -42,7 +43,7 @@ void framebuffer_size_callback(GLFWwindow* window, int width, int height);
 void processInput(GLFWwindow* window);
 triangle tri;
 
-vec3 cameraPos = { 0.0f, 0.0f, 3.0f };
+vec3 cameraPos = { 0.0f, 0.0f, 30.0f };
 vec3 cameraFront = { 0.0f, 0.0f, -1.0f };
 vec3 cameraUp = { 0.0f, 1.0f, 0.0f };
 
@@ -121,7 +122,7 @@ int main()
     //glUniform1i(glGetUniformLocation(myProgram, "texture1"), 0);
     // render loop
     // -----------
-    
+    int name = loadModel(myProgram);
     vec3 newLoc = { 0.0f, 0.0f, -0.5f};
     //glm_rotate_z(model, 270.0f, model);
     //glm_translate(model, newLoc);
@@ -146,8 +147,8 @@ int main()
 
         
        // glUniformMatrix4fv(glGetUniformLocation(myProgram, "projection"), 1, GL_FALSE, &projection[0][0]);
-        initCamera(myProgram, SCR_WIDTH, SCR_HEIGHT, 45.0f, 0.01f, 100.0f, cameraPos, cameraFront, cameraUp);
-
+        initCamera(myProgram, SCR_WIDTH, SCR_HEIGHT, 90.0f, 0.1f, 10000.0f, cameraPos, cameraFront, cameraUp);
+        draw(myProgram);
        
        // glActiveTexture(GL_TEXTURE0);
         //glBindTexture(GL_TEXTURE_2D, texture1);
@@ -161,7 +162,7 @@ int main()
        // triangle tri;
             
        
-        for (int i = 0; i < 10; i++) {
+        /*for (int i = 0; i < 10; i++) {
             
            
 
@@ -177,12 +178,11 @@ int main()
             tri3.three.z = 0.0f;
             vec3 loc = { 0.00001f * i,0.00001f * i, 0.00001f * i };
             glm_translate_to(curModel, loc, curModel);
-            drawTriangle(tri2, myProgram, curModel);
+            //drawTriangle(tri2, myProgram, curModel);
             
             
-            drawTriangle(tri3, myProgram, NULL);
-        }
-
+            //drawTriangle(tri3, myProgram, NULL);
+        }*/
    
        // initMenu(myProgram);
         //glUniformMatrix4fv(glGetUniformLocation(myProgram, "view"), 1, GL_FALSE, &lookAt[0][0]);
@@ -220,7 +220,7 @@ void processInput(GLFWwindow* window)
         else if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) {
             vec3 neg;
             glm_vec3_negate_to(cameraFront, neg);
-            glm_vec3_muladds(neg, cameraSpeed, cameraPos);
+            glm_vec3_muladds(neg, (cameraSpeed*100), cameraPos);
         }
         else if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) {
             vec3 crossNorm;
@@ -233,7 +233,10 @@ void processInput(GLFWwindow* window)
             vec3 crossNorm;
             glm_vec3_crossn(cameraFront, cameraUp, crossNorm);
             glm_vec3_muladds(crossNorm, cameraSpeed, cameraPos);
-        } 
+        }
+        else if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS) {
+            glm_vec3_muladds(cameraUp, cameraSpeed, cameraPos);
+        }
         else if (glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT) == GLFW_PRESS) {
         double x;
         double y;

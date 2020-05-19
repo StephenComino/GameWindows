@@ -39,28 +39,46 @@
     <ClCompile Include="camera.c">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="mesh.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vector.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="modelLoader.c">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="triangle.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="mesh.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="initShaders.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="stb_image.h">
-      <Filter>Source Files</Filter>
+    <ClInclude Include="vector.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="texture.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="menu.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vertexCoords.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="camera.h">
-      <Filter>Source Files</Filter>
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="initShaders.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="menu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="stb_image.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="triangle.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vertexCoords.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="modelLoader.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
