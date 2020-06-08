@@ -1,4 +1,4 @@
-# GameEngine
+# RPG GameEngine in c
 
 # OpenGL Graphic application:
 
